@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,66 +12,55 @@ public class KeypointInfo
 public class HandTracking : MonoBehaviour
 {
     public UdpReceiver udpReceiver;
+    public Vector3 ratio;
+    public float moveSpeed = 1f;
     public GameObject[] handPoints;
     public float positionChangeThreshold = 0.001f; // Adjust as needed
-
-    // Initialize an array to store information for each keypoint
-    private KeypointInfo[] keypointInfos = new KeypointInfo[21];
     // Smoothing factor (0 = no smoothing, 1 = full smoothing)
     public float smoothingFactor = 1f; // Adjust as needed
 
+    // Initialize an array to store information for each keypoint
+    private KeypointInfo[] keypointInfos = new KeypointInfo[21];
 
-    private void Update() 
+
+    public void TrackHand(float zoomFactor, string[] points)
     {
-        string data = udpReceiver.data;
+        if (points == null) return;
 
-        if(!string.IsNullOrEmpty(data))
+        for (int i = 0; i < 21; i++)
         {
-            data = data.Remove(0, 1);
-            data = data.Remove(data.Length - 1, 1);
-            print(data);
+            float x = 10 - float.Parse(points[i * 3]) / ratio.x;
+            float y = float.Parse(points[i * 3 + 1]) / ratio.y;
+            float z = float.Parse(points[i * 3 + 2]) / ratio.z;
 
-            string[] points = data.Split(',');
+            Vector3 newPosition = new Vector3(x, y, z - zoomFactor * moveSpeed);
 
-            for (int i = 0; i < 21; i++)
+            if (keypointInfos[i] == null)
             {
-                float x = 10 - float.Parse(points[i * 3]) / 100f;
-                float y = float.Parse(points[i * 3 + 1]) / 100f;
-                float z = float.Parse(points[i * 3 + 2]) / 30f;
-
-                Vector3 newPosition = new Vector3(x, y, z);
-
-                if (keypointInfos[i] == null)
+                // If no information exists for this keypoint, create a new entry
+                keypointInfos[i] = new KeypointInfo
                 {
-                    // If no information exists for this keypoint, create a new entry
-                    keypointInfos[i] = new KeypointInfo
-                    {
-                        currentPosition = newPosition,
-                        targetPosition = newPosition
-                    };
-                }
-                else
-                {
-                    //// Update the target position for smoothing
-                    //keypointInfos[i].targetPosition = newPosition;
-                    if (Vector3.Distance(keypointInfos[i].targetPosition, newPosition) > positionChangeThreshold)
-                    {
-                        keypointInfos[i].targetPosition = newPosition;
-                    }
-
-                    // Smoothly interpolate between the current and target positions
-                    keypointInfos[i].currentPosition = Vector3.Lerp(keypointInfos[i].currentPosition, keypointInfos[i].targetPosition, smoothingFactor);
-
-
-                }
-
-
-                // Set the position of the handPoint
-                handPoints[i].transform.position = keypointInfos[i].currentPosition;
-
-                ////handPoints[i].transform.localPosition = new Vector3(x, y, z);
-                //handPoints[i].transform.position = new Vector3(x, y, z);    
+                    currentPosition = newPosition,
+                    targetPosition = newPosition
+                };
             }
+            else
+            {
+                //// Update the target position for smoothing
+                //keypointInfos[i].targetPosition = newPosition;
+                if (Vector3.Distance(keypointInfos[i].targetPosition, newPosition) > positionChangeThreshold)
+                {
+                    keypointInfos[i].targetPosition = newPosition;
+                }
+
+                // Smoothly interpolate between the current and target positions
+                keypointInfos[i].currentPosition = Vector3.Lerp(keypointInfos[i].currentPosition, keypointInfos[i].targetPosition, smoothingFactor);
+
+
+            }
+
+            // Set the position of the handPoint
+            handPoints[i].transform.position = keypointInfos[i].currentPosition;
         }
     }
 }

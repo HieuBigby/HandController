@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Tool : ScriptableWizard
 {
-    public GameObject oldHand, newHand;
+    public GameObject newHand;
     public GameObject handTracking;
 
 
@@ -21,27 +21,58 @@ public class Tool : ScriptableWizard
 
         if(GUILayout.Button("Change new Hand"))
         {
-            LineConnect[] lineConnects = handTracking.GetComponentsInChildren<LineConnect>(true);
+            OverrideRotation[] overrideRotations = handTracking.GetComponentsInChildren<OverrideRotation>(true);
+            OverridePosition[] overridePositions = handTracking.GetComponentsInChildren<OverridePosition>(true);
             Transform[] newHandChildren = newHand.GetComponentsInChildren<Transform>(true);
 
-            foreach(LineConnect lineConnect in lineConnects)
+            // Thay OverrideRotation
+            foreach (OverrideRotation overrideRotation in overrideRotations)
             {
-                if (!lineConnect.overrideTransform) continue;
-                Transform overrideTransform = lineConnect.overrideTransform;
+                if (!overrideRotation.overrideTransform)
+                {
+                    Debug.LogError(overrideRotation.name + " không có override transform", overrideRotation);
+                    continue;
+                }
+                Transform overrideTransform = overrideRotation.overrideTransform;
 
                 bool found = false;
-                foreach(Transform child in newHandChildren)
+                foreach (Transform child in newHandChildren)
                 {
-                    if(overrideTransform.name == child.name)
+                    if (overrideTransform.name == child.name)
                     {
-                        Undo.RecordObject(lineConnect, "Change Override");
-                        lineConnect.overrideTransform = child;
+                        Undo.RecordObject(overrideRotation, "Change Rotation Override");
+                        overrideRotation.overrideTransform = child;
                         found = true;
                         break;
                     }
                 }
 
-                if(!found) Debug.LogError("Không tìm thấy " + overrideTransform.name + " để thay Override"); 
+                if (!found) Debug.LogError("Không tìm thấy " + overrideTransform.name + " để thay Override");
+            }
+
+            // Thay OverridePosition
+            foreach (OverridePosition overridePosition in overridePositions)
+            {
+                if (!overridePosition.overrideTransform)
+                {
+                    Debug.LogError(overridePosition.name + " không có override transform", overridePosition);
+                    continue;
+                }
+                Transform overrideTransform = overridePosition.overrideTransform;
+
+                bool found = false;
+                foreach (Transform child in newHandChildren)
+                {
+                    if (overrideTransform.name == child.name)
+                    {
+                        Undo.RecordObject(overridePosition, "Change Position Override");
+                        overridePosition.overrideTransform = child;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) Debug.LogError("Không tìm thấy " + overrideTransform.name + " để thay Override");
             }
         }
     }
