@@ -14,6 +14,8 @@ public class HandTracking : MonoBehaviour
     public UdpReceiver udpReceiver;
     public Vector3 ratio;
     public float moveSpeed = 1f;
+    public float xZoomFactor = 2f;
+    public float xOffset = 10f;
     public GameObject[] handPoints;
     public float positionChangeThreshold = 0.001f; // Adjust as needed
     // Smoothing factor (0 = no smoothing, 1 = full smoothing)
@@ -21,7 +23,13 @@ public class HandTracking : MonoBehaviour
 
     // Initialize an array to store information for each keypoint
     private KeypointInfo[] keypointInfos = new KeypointInfo[21];
+    private Vector3 originalPosition;
 
+
+    private void Awake()
+    {
+        originalPosition = transform.position;
+    }
 
     public void TrackHand(float zoomFactor, string[] points)
     {
@@ -29,11 +37,24 @@ public class HandTracking : MonoBehaviour
 
         for (int i = 0; i < 21; i++)
         {
-            float x = 10 - float.Parse(points[i * 3]) / ratio.x;
+            float x = xOffset - float.Parse(points[i * 3]) / ratio.x;
             float y = float.Parse(points[i * 3 + 1]) / ratio.y;
             float z = float.Parse(points[i * 3 + 2]) / ratio.z;
 
+            float centerX = xOffset - 320 / ratio.x;
+            float xPoint0 = xOffset - float.Parse(points[0]) / ratio.x;
             Vector3 newPosition = new Vector3(x, y, z - zoomFactor * moveSpeed);
+            if(xPoint0 > centerX)
+            {
+                Debug.Log("xPoint0 ở bên phải, giảm x về phía bên trái: " + xPoint0 + "/" + centerX);
+                newPosition.x -= zoomFactor * xZoomFactor;
+            }
+            else
+            {
+                Debug.Log("xPoint0 ở bên trái, đưa x về phía bên phải: " + xPoint0 + "/" + centerX);
+                newPosition.x += zoomFactor * xZoomFactor;
+            }
+            //Vector3 newPosition = new Vector3(x, y, z);
 
             if (keypointInfos[i] == null)
             {
