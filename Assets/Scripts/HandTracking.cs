@@ -17,6 +17,8 @@ public class HandTracking : MonoBehaviour
     public float xZoomFactor = 2f;
     public float xOffset = 10f;
     public GameObject[] handPoints;
+    public GameObject handModel;
+    public float zoomMultipler = 1;
     public float positionChangeThreshold = 0.001f; // Adjust as needed
     // Smoothing factor (0 = no smoothing, 1 = full smoothing)
     public float smoothingFactor = 1f; // Adjust as needed
@@ -34,6 +36,7 @@ public class HandTracking : MonoBehaviour
     public void TrackHand(float zoomFactor, string[] points)
     {
         if (points == null) return;
+        //handModel.transform.localScale = Vector3.one * zoomFactor * zoomMultipler;
 
         for (int i = 0; i < 21; i++)
         {
@@ -44,7 +47,7 @@ public class HandTracking : MonoBehaviour
             float centerX = xOffset - 320 / ratio.x;
             float xPoint0 = xOffset - float.Parse(points[0]) / ratio.x;
             Vector3 newPosition = new Vector3(x, y, z - zoomFactor * moveSpeed);
-            if(xPoint0 > centerX)
+            if (xPoint0 > centerX)
             {
                 Debug.Log("xPoint0 ở bên phải, giảm x về phía bên trái: " + xPoint0 + "/" + centerX);
                 newPosition.x -= zoomFactor * xZoomFactor;
@@ -54,6 +57,7 @@ public class HandTracking : MonoBehaviour
                 Debug.Log("xPoint0 ở bên trái, đưa x về phía bên phải: " + xPoint0 + "/" + centerX);
                 newPosition.x += zoomFactor * xZoomFactor;
             }
+
             //Vector3 newPosition = new Vector3(x, y, z);
 
             if (keypointInfos[i] == null)
