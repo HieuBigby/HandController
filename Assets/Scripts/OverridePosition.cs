@@ -9,5 +9,6 @@ public class OverridePosition : MonoBehaviour
     private void Update()
     {
         overrideTransform.position = transform.position;
+        //overrideTransform.rotation = transform.rotation;
     }
 }

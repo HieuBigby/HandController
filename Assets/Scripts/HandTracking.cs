@@ -25,13 +25,7 @@ public class HandTracking : MonoBehaviour
 
     // Initialize an array to store information for each keypoint
     private KeypointInfo[] keypointInfos = new KeypointInfo[21];
-    private Vector3 originalPosition;
 
-
-    private void Awake()
-    {
-        originalPosition = transform.position;
-    }
 
     public void TrackHand(float zoomFactor, string[] points)
     {
@@ -86,6 +80,19 @@ public class HandTracking : MonoBehaviour
 
             // Set the position of the handPoint
             handPoints[i].transform.position = keypointInfos[i].currentPosition;
+        }
+
+        // Xoay mô hình bàn tay theo hướng của lòng bàn tay 
+        transform.position = handPoints[0].transform.position;
+        Vector3 vector_0_5 = handPoints[5].transform.position - handPoints[0].transform.position;
+        Vector3 vector_0_17 = handPoints[17].transform.position - handPoints[0].transform.position;
+        if(handModel.name.Contains("left"))
+        {
+            transform.forward = Vector3.Cross(vector_0_5, vector_0_17);
+        }
+        else if (handModel.name.Contains("right"))
+        {
+            transform.forward = -Vector3.Cross(vector_0_5, vector_0_17);
         }
     }
 }
