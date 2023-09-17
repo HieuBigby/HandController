@@ -43,12 +43,12 @@ public class HandTracking : MonoBehaviour
             Vector3 newPosition = new Vector3(x, y, z - zoomFactor * moveSpeed);
             if (xPoint0 > centerX)
             {
-                Debug.Log("xPoint0 ở bên phải, giảm x về phía bên trái: " + xPoint0 + "/" + centerX);
+                //Debug.Log("xPoint0 ở bên phải, giảm x về phía bên trái: " + xPoint0 + "/" + centerX);
                 newPosition.x -= zoomFactor * xZoomFactor;
             }
             else
             {
-                Debug.Log("xPoint0 ở bên trái, đưa x về phía bên phải: " + xPoint0 + "/" + centerX);
+                //Debug.Log("xPoint0 ở bên trái, đưa x về phía bên phải: " + xPoint0 + "/" + centerX);
                 newPosition.x += zoomFactor * xZoomFactor;
             }
 
