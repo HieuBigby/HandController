@@ -27,10 +27,18 @@ public class HandTracking : MonoBehaviour
     private KeypointInfo[] keypointInfos = new KeypointInfo[21];
 
 
-    public void TrackHand(float zoomFactor, string[] points)
+    public void TrackHand(string[] points)
     {
         if (points == null) return;
-        //handModel.transform.localScale = Vector3.one * zoomFactor * zoomMultipler;
+
+        // Di chuyển bàn tay theo tỉ lệ của lòng bàn tay
+        Vector3 A = handPoints[0].transform.position;
+        Vector3 B = handPoints[5].transform.position;
+        Vector3 C = handPoints[17].transform.position;
+        Vector3 V = Vector3.Cross(A - B, A - C);
+        float area = V.magnitude * 0.5f;
+        float zoomFactor = area * 0.5f - 1;
+        //Debug.Log("Zoom factor: " + zoomFactor);
 
         for (int i = 0; i < 21; i++)
         {
@@ -38,9 +46,11 @@ public class HandTracking : MonoBehaviour
             float y = float.Parse(points[i * 3 + 1]) / ratio.y;
             float z = float.Parse(points[i * 3 + 2]) / ratio.z;
 
-            float centerX = xOffset - 320 / ratio.x;
+            // Đưa bàn tay sát gần nhau khi tiến gần đến camera
+            float centerX = xOffset - (Screen.width / 2f) / ratio.x;
             float xPoint0 = xOffset - float.Parse(points[0]) / ratio.x;
             Vector3 newPosition = new Vector3(x, y, z - zoomFactor * moveSpeed);
+
             if (xPoint0 > centerX)
             {
                 //Debug.Log("xPoint0 ở bên phải, giảm x về phía bên trái: " + xPoint0 + "/" + centerX);
@@ -73,9 +83,8 @@ public class HandTracking : MonoBehaviour
                 }
 
                 // Smoothly interpolate between the current and target positions
-                keypointInfos[i].currentPosition = Vector3.Lerp(keypointInfos[i].currentPosition, keypointInfos[i].targetPosition, smoothingFactor);
-
-
+                keypointInfos[i].currentPosition = Vector3.Lerp(keypointInfos[i].currentPosition, 
+                    keypointInfos[i].targetPosition, smoothingFactor);
             }
 
             // Set the position of the handPoint

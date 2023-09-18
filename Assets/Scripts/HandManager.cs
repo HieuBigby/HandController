@@ -9,6 +9,7 @@ public class HandManager : MonoBehaviour
     public UdpReceiver udpReceiver;
     public HandTracking leftHandTracking, rightHandTracking;
 
+
     private void Update()
     {
         string data = udpReceiver.data;
@@ -28,7 +29,6 @@ public class HandManager : MonoBehaviour
                 //print(segment);
                 string[] dataRaw = segment.Split(',');
                 string handTypeData = dataRaw[0];
-                float zoomFactor = float.Parse(dataRaw[1]);
                 
                 //print("HandType: " + handTypeData);
                 if (string.IsNullOrEmpty(handTypeData))
@@ -36,17 +36,17 @@ public class HandManager : MonoBehaviour
                     continue;
                 }
 
-                string[] handPoints = dataRaw.Skip(2).ToArray();
+                string[] handPoints = dataRaw.Skip(1).ToArray();
 
                 if(handTypeData.Contains("Left"))
                 {
                     //print("Control left hand!");
-                    leftHandTracking.TrackHand(zoomFactor, handPoints);
+                    leftHandTracking.TrackHand(handPoints);
                 }
                 else if(handTypeData.Contains("Right"))
                 {
                     //print("Control right hand!");
-                    rightHandTracking.TrackHand(zoomFactor, handPoints);
+                    rightHandTracking.TrackHand(handPoints);
                 }
             }
         }

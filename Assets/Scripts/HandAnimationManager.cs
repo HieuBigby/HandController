@@ -14,6 +14,7 @@ public class HandAnimationManager : MonoBehaviour
     public float normalizedTimeOffset;
     public float normalizedTransitionTime;
 
+
     [Button]
     public void PlaySequenceAnimation()
     {
