@@ -4,11 +4,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
+[Serializable]
+public class AnimDict
+{
+    public string word;
+    public AnimationClip clip;
+}
+
 public class SentenceConverter : MonoBehaviour
 {
+    public List<AnimDict> animDicts = new List<AnimDict>();
+    public HandAnimationManager animationManager;
     public TMP_InputField inputField; 
 
     private string filePath = "Assets/Pythons/python-3.8.0-embed/languageToSign.py";
@@ -38,30 +48,55 @@ public class SentenceConverter : MonoBehaviour
     [Button]
     public void RunPythonFile()
     {
-        using (Py.GIL()) // Acquire the Global Interpreter Lock
+        //using (Py.GIL()) // Acquire the Global Interpreter Lock
+        //{
+        Debug.Log("Running Python...");
+        Debug.Log(inputField.text);
+        var parameter = new PyString(inputField.text);
+
+        PyDict replacements = new PyDict();
+        replacements["Tôi Tên"] = new PyString("Tôi tên là");
+        replacements["Vui Gặp"] = new PyString("Rất vui được gặp bạn");
+        replacements["E^/"] = new PyString("Ế");
+
+        PyList vocab_dict = new PyList();
+        vocab_dict.Append(new PyString("Xin chào"));
+        vocab_dict.Append(new PyString("Tôi"));
+        vocab_dict.Append(new PyString("Tên"));
+        vocab_dict.Append(new PyString("H"));
+        vocab_dict.Append(new PyString("I"));
+        vocab_dict.Append(new PyString("Ế"));
+        vocab_dict.Append(new PyString("U"));
+        vocab_dict.Append(new PyString("Em"));
+
+        var result = pythonScript.InvokeMethod("language_to_sign", new PyObject[] { parameter, replacements, vocab_dict });
+        Debug.Log(result);
+        AnimationClip[] clipSequence = CreateAnimationSequence(result);
+        animationManager.PlaySequenceAnimation(clipSequence);
+        //}
+    }
+
+    public AnimationClip[] CreateAnimationSequence(PyObject result)
+    {
+        PyIter pyIter = PyIter.GetIter(result); // Replace yourPythonObject with your Python iterable
+        List<AnimationClip> animations = new List<AnimationClip>();   
+
+        while (pyIter.MoveNext())
         {
-            Debug.Log("Running Python...");
-            Debug.Log(inputField.text);
-            var parameter = new PyString(inputField.text);
-
-            PyDict replacements = new PyDict();
-            replacements["Tôi tên"] = new PyString("Tôi tên là");
-            replacements["Vui Gặp"] = new PyString("Rất vui được gặp bạn");
-            replacements["E^/"] = new PyString("Ế");
-
-            PyList vocab_dict = new PyList();
-            vocab_dict.Append(new PyString("Xin chào"));
-            vocab_dict.Append(new PyString("Tôi"));
-            vocab_dict.Append(new PyString("Tên"));
-            vocab_dict.Append(new PyString("H"));
-            vocab_dict.Append(new PyString("I"));
-            vocab_dict.Append(new PyString("Ế"));
-            vocab_dict.Append(new PyString("U"));
-            vocab_dict.Append(new PyString("Em"));
-
-            var result = pythonScript.InvokeMethod("language_to_sign", new PyObject[] { parameter, replacements, vocab_dict });
-            Debug.Log(result);
+            PyObject pyObject = pyIter.Current;
+            string word = pyObject.ToString();
+            AnimDict foundAnimDict = animDicts.FirstOrDefault(animDict => animDict.word.Equals(word));
+            if(foundAnimDict != null)
+            {
+                animations.Add(foundAnimDict.clip);
+            }
+            else
+            {
+                Debug.LogError("Không tìm thấy " + word);
+            }
         }
+
+        return animations.ToArray();
     }
 
     //[Button]

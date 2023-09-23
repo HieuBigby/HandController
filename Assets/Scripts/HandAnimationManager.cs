@@ -6,7 +6,7 @@ using UnityEngine;
 public class HandAnimationManager : MonoBehaviour
 {
     public Animator handAnimator;
-    public AnimationClip[] testAnimations;
+    //public AnimationClip[] testAnimations;
     public float blendTime = 0.3f;
     public float hideDelay = 3f;
     public float inbetweenOffset = 0.5f;
@@ -15,19 +15,18 @@ public class HandAnimationManager : MonoBehaviour
     public float normalizedTransitionTime;
 
 
-    [Button]
-    public void PlaySequenceAnimation()
+    public void PlaySequenceAnimation(AnimationClip[] clipSequence)
     {
         IEnumerator PlayAnimationRoutine()
         {
             handAnimator.Play("HandShow", 0);
-            for (int i = 0; i < testAnimations.Length; i++)
+            for (int i = 0; i < clipSequence.Length; i++)
             {
-                if(i == 0) handAnimator.Play(testAnimations[i].name, 1);
-                yield return new WaitForSeconds(testAnimations[i].length - inbetweenOffset);
-                if (i < testAnimations.Length - 1)
+                if(i == 0) handAnimator.Play(clipSequence[i].name, 1);
+                yield return new WaitForSeconds(clipSequence[i].length - inbetweenOffset);
+                if (i < clipSequence.Length - 1)
                 {
-                    handAnimator.CrossFade(testAnimations[i + 1].name, normalizedTransitionDuration,
+                    handAnimator.CrossFade(clipSequence[i + 1].name, normalizedTransitionDuration,
                         1, normalizedTimeOffset, normalizedTransitionTime);
                 }
             }
