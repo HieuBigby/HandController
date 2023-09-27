@@ -1,7 +1,9 @@
 using NaughtyAttributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class HandAnimationManager : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class HandAnimationManager : MonoBehaviour
     public float normalizedTransitionTime;
 
 
-    public void PlaySequenceAnimation(AnimationClip[] clipSequence)
+    public void PlaySequenceAnimation(AnimationClip[] clipSequence, Action onComplete = null)
     {
         IEnumerator PlayAnimationRoutine()
         {
@@ -33,6 +35,7 @@ public class HandAnimationManager : MonoBehaviour
             yield return new WaitForSeconds(hideDelay);
             handAnimator.Play("HandHide", 0);
             yield return new WaitForSeconds(0.5f);
+            onComplete?.Invoke();
         }
         StartCoroutine(PlayAnimationRoutine()); 
     }

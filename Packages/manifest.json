@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.unity.animation.rigging": "1.2.1",
+    "com.unity.barracuda": "https://github.com/Unity-Technologies/barracuda-release.git",
     "com.unity.collab-proxy": "2.0.5",
     "com.unity.feature.development": "1.0.1",
     "com.unity.recorder": "4.0.1",
