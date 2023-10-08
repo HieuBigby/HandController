@@ -1,9 +1,11 @@
-using NaughtyAttributes;
+﻿using NaughtyAttributes;
 using Python.Runtime;
 using PythonEvent;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using Unity.Barracuda;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,221 +13,93 @@ using UnityEngine.UI;
 public class WebCamReader : MonoBehaviour
 {
     public RawImage img;
+    public TextMeshProUGUI detectText;
 
     private WebCamTexture webCam;
     private bool isDetecting;
     private string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
     private string imageFilePath = "Assets/Pictures/tex.jpg";
-
     private string[] actions = {"A", "B", "C", "D", "E"};
 
     private dynamic detectScript;
     private dynamic cv2;
-    private dynamic np;
     private dynamic cap;
     private dynamic mp;
     private dynamic holistic;
     private dynamic model;
 
-    private PyList sequences;
-    private Thread videoThread;
-    private bool isRunning = false;
 
-    public NNModel modelAsset;
-
-    private Model runtimeModel;
-    private IWorker engine;
-
-
-    private void Start()
-    {
-        //EventHandler.PrintCallback -= PrintFromWebCam;
-        //EventHandler.PrintCallback += PrintFromWebCam;
-
-        //runtimeModel = ModelLoader.Load(modelAsset);
-        //engine = WorkerFactory.CreateWorker(runtimeModel, WorkerFactory.Device.GPU);
-
-        ShowWebCam();
-        StartDetect();
-    }
-
-    public void PrintFromWebCam()
-    {
-        Debug.Log("Hello");
-    }
-
+    [Button]
     public void ShowWebCam()
     {
         webCam = new WebCamTexture();
-        if(webCam.isPlaying == false ) webCam.Play();
+        if(webCam.isPlaying == false) webCam.Play();
         img.texture = webCam;
     }
 
-
+    [Button]
     public void StartDetect()
     {
-        //PythonEngine.BeginAllowThreads();
+        // Import thư viện 
+        detectScript = Py.Import("actionDetect");
+        cv2 = Py.Import("cv2");
+        mp = Py.Import("mediapipe");
 
-        if(PythonEngine.IsInitialized)
+        // Khởi tạo mediapipe
+        dynamic mp_holistic = mp.solutions.holistic;
+        holistic = mp_holistic.Holistic(min_detection_confidence: 0.5, min_tracking_confidence: 0.5);
+
+        // Khởi tạo model phát hiện thủ ngữ 
+        string modelPath = $"{handDetectPath}/action_test_2.h5";
+        model = detectScript.load_model(modelPath, actions.Length);
+
+        isDetecting = true;
+        StartCoroutine(DetectRoutine());
+    }
+
+    // Logic phát hiện thủ ngữ
+    public IEnumerator DetectRoutine()
+    {
+        PyList sequences = new PyList();
+
+        while (isDetecting)
         {
-            Debug.Log("Shutdown");
-            PythonEngine.Shutdown();
-        }
-
-        //Runtime.TryCollectingGarbage(10);
-        Runtime.PythonDLL = "Assets/Pythons/python-3.8.0-embed/python38.dll";
-
-        IEnumerator RunRoutine()
-        {
-            // Initialize Python.NET
-            PythonEngine.Initialize();
-
-            while (PythonEngine.IsInitialized == false)
-            {
-                Debug.Log("Initing...");
-                yield return null;
-            }
-
-            detectScript = Py.Import("actionDetect");
-            cv2 = Py.Import("cv2");
-            mp = Py.Import("mediapipe");
-
-            dynamic mp_holistic = mp.solutions.holistic;
-            holistic = mp_holistic.Holistic();
-
-            sequences = new PyList();
-
-            isDetecting = true;
-
-
-            //string modelPath = handDetectPath + "/" + "action_test_2.h5";
-
-            //model = detectScript.load_model(modelPath, (10, 126), 5);
-        }
-        StartCoroutine(RunRoutine());
-        //np = Py.Import("numpy");
-        //cap = cv2.VideoCapture(0);
-
-        //Thread videoThread = new Thread(StartVideo);
-        //videoThread.Start();
-        //StartVideo();
-
-        //isDetecting = true;
-
-        //StartCoroutine(StartVideoCapture());
-
-        //string modelPath = handDetectPath + "/" + "action_test_2.h5";
-        //dynamic my_module = Py.Import("actionDetect");
-        //my_module.begin_detect(modelPath);
-    }
-
-    private void OnDestroy()
-    {
-        if (PythonEngine.IsInitialized)
-        {
-            PythonEngine.Shutdown();
-        }
-    }
-
-    public void StartVideo_1()
-    {
-        //Debug.Log("Thread start...");
-        //using (Py.GIL())
-        //{
-        //    intPtr = PythonEngine.BeginAllowThreads();
-        //    Debug.Log(intPtr.ToString());   
-        //    detectScript.video_capture();
-        //}
-    }
-
-    private IEnumerator StartVideoCapture()
-    {
-        Debug.Log("Starting...");
-        isRunning = true;
-        string modelPath = handDetectPath + "/" + "action_test_2.h5";
-        dynamic my_module = Py.Import("actionDetect");
-        my_module.begin_detect(modelPath);
-        yield return null;
-    }
-
-    public void StopDetect_1()
-    {
-        isDetecting = false;
-        //PythonEngine.EndAllowThreads(intPtr);
-
-        isRunning = false; // Signal the video thread to stop
-        //videoThread.Join(); // Wait for the video thread to finish
-        PythonEngine.Shutdown();
-    }
-
-    private void Update()
-    {
-        if(isDetecting)
-        {
-            //detectScript.video_capture();
-
+            // Lưu ảnh vào thư mục để đọc ảnh bằng cv2 
             Texture2D rawImageTexture = GetTexture2D(img.mainTexture);
             byte[] imageBytes = rawImageTexture.EncodeToJPG();
             System.IO.File.WriteAllBytes(imageFilePath, imageBytes);
-
+            yield return null;
             dynamic readImg = cv2.imread(imageFilePath);
-            //PyString pyFilePath = new PyString(imageFilePath);
-            //PyObject keypoints = detectScript.InvokeMethod("get_keypoints_path", pyFilePath);
+            yield return null;
 
-
-            dynamic results = holistic.process(readImg);
+            // Lấy thông tin về các điểm keypoints
+            dynamic results = holistic.process(cv2.cvtColor(readImg, cv2.COLOR_BGR2RGB));
+            yield return null;
             dynamic keypoints = detectScript.extract_keypoints(results);
-           
-            sequences.Append(keypoints);
+            //Debug.Log(keypoints);
 
-            if(sequences.Length() == 10)
+            // Nếu đủ 10 batch keypoint thì đưa vào mô hình để phát hiện
+            sequences.Append(keypoints);
+            if (sequences.Length() == 10)
             {
                 // Detect 
                 dynamic detected = detectScript.detect(sequences, model);
                 Debug.Log(detected);
 
+                if ((object)detected != null) detectText.text = actions[(int)detected];
+                //int? index = detected as int?;
+                //if (index.HasValue == true) detectText.text = actions[index.Value];
+                //else detectText.text = "";
+
                 sequences.DelItem(0);
             }
-            //Debug.Log(sequences.Length());
-
-
-            //dynamic keypoints = detectScript.get_keypoints(readImg);
-
-            //Debug.Log(keypoints);
-
-            //PyList image = TextureToIntegerList(rawImageTexture);
-            //dynamic image_array = np.array(image);
-            //cv2.imshow("Test", image_array);
-            //int channelCount = 3;
-            //var inputX = new Tensor(img.texture, channelCount);
-
-            //using (Py.GIL()) // Acquire the Global Interpreter Lock
-            //{
-            //    // Convert the Unity Texture2D to a byte array
-            //    Texture2D rawImageTexture = GetTextureFromRawImage(img);
-            //    byte[] bytes = rawImageTexture.GetRawTextureData();
-
-            //    // Create a NumPy array from the byte array
-            //    PyObject npArray = cv2.imdecode(bytes, cv2.IMREAD_COLOR);
-            //    dynamic keypoints = detectScript.get_keypoints(npArray);
-            //    Debug.Log(keypoints);
-            //    //detectScript.InvokeMethod("get_keypoints", npArray);
-            //}
         }
     }
 
-    private PyList TextureToIntegerList(Texture2D texture)
+    [Button]
+    public void StopDetect()
     {
-        PyList pixelValues = new PyList();
-        Color32[] pixels = texture.GetPixels32();
-
-        foreach (Color32 pixel in pixels)
-        {
-            int value = (pixel.r << 16) | (pixel.g << 8) | pixel.b;
-            pixelValues.Append(value.ToPython());
-        }
-
-        return pixelValues;
+        isDetecting = false;
     }
 
     private Texture2D GetTexture2D(Texture texture)

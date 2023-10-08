@@ -16783,6 +16783,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   img: {fileID: 1473758075}
+  detectText: {fileID: 1106448807}
 --- !u!114 &1473758075
 MonoBehaviour:
   m_ObjectHideFlags: 0

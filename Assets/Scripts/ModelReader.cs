@@ -39,16 +39,16 @@ public class ModelReader : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Predicting...");
-            int channelCount = 1;
-            var inputX = new Tensor(texture, channelCount);
+        //if(Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    Debug.Log("Predicting...");
+        //    int channelCount = 1;
+        //    var inputX = new Tensor(texture, channelCount);
 
-            Tensor outputY = engine.Execute(inputX).PeekOutput();
-            inputX.Dispose();
-            prediction.SetPrediction(outputY);
-        }
+        //    Tensor outputY = engine.Execute(inputX).PeekOutput();
+        //    inputX.Dispose();
+        //    prediction.SetPrediction(outputY);
+        //}
     }
 
     private void OnDestroy()

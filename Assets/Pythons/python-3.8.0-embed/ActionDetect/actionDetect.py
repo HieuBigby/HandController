@@ -306,9 +306,9 @@ def begin_detect(model_path):
         cv2.destroyAllWindows()
 
 
-def load_model(model_path, input_shape, output_shape):
+def load_model(model_path, output_shape):
     model = Sequential()
-    model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=input_shape)) # input_shape=(sequence_length, 258)
+    model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(10, 126))) # input_shape=(sequence_length, 258)
     model.add(Dropout(0.2))
     model.add(LSTM(128, return_sequences=True, activation='relu'))
     model.add(Dropout(0.2))
