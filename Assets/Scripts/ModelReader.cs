@@ -32,9 +32,9 @@ public class ModelReader : MonoBehaviour
 
     public void Start()
     {
-        runtimeModel = ModelLoader.Load(modelAsset);
-        engine = WorkerFactory.CreateWorker(runtimeModel, WorkerFactory.Device.GPU);
-        prediction = new Prediction();
+        //runtimeModel = ModelLoader.Load(modelAsset);
+        //engine = WorkerFactory.CreateWorker(runtimeModel, WorkerFactory.Device.GPU);
+        //prediction = new Prediction();
     }
 
     private void Update()

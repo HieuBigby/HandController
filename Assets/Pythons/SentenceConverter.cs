@@ -35,19 +35,19 @@ public class SentenceConverter : MonoBehaviour
 
     private void Start()
     {
-        Runtime.PythonDLL = pythonPath;
+        //Runtime.PythonDLL = pythonPath;
 
-        PythonEngine.Initialize();
+        //PythonEngine.Initialize();
 
 
-        dynamic sys = Py.Import("sys");
-        //sys.path.remove("E:\\Hieu\\UnityProjects\\TestHand\\Assets\\Pythons\\python-3.8.0-embed\\Lib\\site-packages\\cv2");
-        //sys.path.remove("Assets/Pythons/python-3.8.0-embed/Lib/site-packages/cv2");
-        sys.path.append(handDetectPath);
-        Debug.Log(sys.path);
+        //dynamic sys = Py.Import("sys");
+        ////sys.path.remove("E:\\Hieu\\UnityProjects\\TestHand\\Assets\\Pythons\\python-3.8.0-embed\\Lib\\site-packages\\cv2");
+        ////sys.path.remove("Assets/Pythons/python-3.8.0-embed/Lib/site-packages/cv2");
+        //sys.path.append(handDetectPath);
+        //Debug.Log(sys.path);
 
-        dynamic os = Py.Import("os");
-        Debug.Log(os.getcwd());
+        //dynamic os = Py.Import("os");
+        //Debug.Log(os.getcwd());
 
         //dynamic my_module = Py.Import("cv2");
         //my_module.VideoCapture(0);
@@ -67,33 +67,10 @@ public class SentenceConverter : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (PythonEngine.IsInitialized)
-        {
-            PythonEngine.Shutdown();
-        }
-    }
-
-    [Button]
-    public async void Test()
-    {
-        Debug.Log("Start Detect Async...");
-        await StartDetectAsync();
-        Debug.Log("Async operation completed.");
-    }
-
-    public async Task StartDetectAsync()
-    {
-        await Task.Run(async () =>
-        {
-            Debug.Log("Running Task...");
-            //using (Py.GIL()) // Acquire the Global Interpreter Lock
-            //{
-                Debug.Log("Finding model...");
-                string modelPath = handDetectPath + "/" + "action_test_2.h5";
-                dynamic my_module = Py.Import("actionDetect");
-                await my_module.begin_detect(modelPath);
-            //}
-        });
+        //if (PythonEngine.IsInitialized)
+        //{
+        //    PythonEngine.Shutdown();
+        //}
     }
 
     public void StartDetect()

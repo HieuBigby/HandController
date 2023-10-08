@@ -39,11 +39,14 @@ public class WebCamReader : MonoBehaviour
 
     private void Start()
     {
-        EventHandler.PrintCallback -= PrintFromWebCam;
-        EventHandler.PrintCallback += PrintFromWebCam;
+        //EventHandler.PrintCallback -= PrintFromWebCam;
+        //EventHandler.PrintCallback += PrintFromWebCam;
 
         //runtimeModel = ModelLoader.Load(modelAsset);
         //engine = WorkerFactory.CreateWorker(runtimeModel, WorkerFactory.Device.GPU);
+
+        ShowWebCam();
+        StartDetect();
     }
 
     public void PrintFromWebCam()
@@ -51,7 +54,6 @@ public class WebCamReader : MonoBehaviour
         Debug.Log("Hello");
     }
 
-    [Button]
     public void ShowWebCam()
     {
         webCam = new WebCamTexture();
@@ -59,26 +61,48 @@ public class WebCamReader : MonoBehaviour
         img.texture = webCam;
     }
 
-    [Button]
+
     public void StartDetect()
     {
-        Runtime.PythonDLL = "E:/Hieu/UnityProjects/TestHand/Assets/Pythons/python-3.8.0-embed/python38.dll";
+        //PythonEngine.BeginAllowThreads();
 
-        // Initialize Python.NET
-        PythonEngine.Initialize();
+        if(PythonEngine.IsInitialized)
+        {
+            Debug.Log("Shutdown");
+            PythonEngine.Shutdown();
+        }
 
-        detectScript = Py.Import("actionDetect");
-        cv2 = Py.Import("cv2");
-        mp = Py.Import("mediapipe");
+        //Runtime.TryCollectingGarbage(10);
+        Runtime.PythonDLL = "Assets/Pythons/python-3.8.0-embed/python38.dll";
 
-        dynamic mp_holistic = mp.solutions.holistic;
-        holistic = mp_holistic.Holistic();
+        IEnumerator RunRoutine()
+        {
+            // Initialize Python.NET
+            PythonEngine.Initialize();
 
-        sequences = new PyList();
+            while (PythonEngine.IsInitialized == false)
+            {
+                Debug.Log("Initing...");
+                yield return null;
+            }
 
-        string modelPath = handDetectPath + "/" + "action_test_2.h5";
+            detectScript = Py.Import("actionDetect");
+            cv2 = Py.Import("cv2");
+            mp = Py.Import("mediapipe");
 
-        model = detectScript.load_model(modelPath, (10, 126), 5);
+            dynamic mp_holistic = mp.solutions.holistic;
+            holistic = mp_holistic.Holistic();
+
+            sequences = new PyList();
+
+            isDetecting = true;
+
+
+            //string modelPath = handDetectPath + "/" + "action_test_2.h5";
+
+            //model = detectScript.load_model(modelPath, (10, 126), 5);
+        }
+        StartCoroutine(RunRoutine());
         //np = Py.Import("numpy");
         //cap = cv2.VideoCapture(0);
 
@@ -86,7 +110,7 @@ public class WebCamReader : MonoBehaviour
         //videoThread.Start();
         //StartVideo();
 
-        isDetecting = true;
+        //isDetecting = true;
 
         //StartCoroutine(StartVideoCapture());
 
@@ -95,7 +119,15 @@ public class WebCamReader : MonoBehaviour
         //my_module.begin_detect(modelPath);
     }
 
-    public void StartVideo()
+    private void OnDestroy()
+    {
+        if (PythonEngine.IsInitialized)
+        {
+            PythonEngine.Shutdown();
+        }
+    }
+
+    public void StartVideo_1()
     {
         //Debug.Log("Thread start...");
         //using (Py.GIL())
@@ -116,8 +148,7 @@ public class WebCamReader : MonoBehaviour
         yield return null;
     }
 
-    [Button]
-    public void StopDetect()
+    public void StopDetect_1()
     {
         isDetecting = false;
         //PythonEngine.EndAllowThreads(intPtr);
