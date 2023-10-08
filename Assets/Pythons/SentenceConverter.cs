@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -20,21 +22,47 @@ public class SentenceConverter : MonoBehaviour
     public List<AnimDict> animDicts = new List<AnimDict>();
     public HandAnimationManager animationManager;
     public TMP_InputField inputField; 
+    public Animation inputAnimation;
 
     private string filePath = "Assets/Pythons/python-3.8.0-embed/languageToSign.py";
     private string fileName = "languageToSign";
     private string pythonPath = "Assets/Pythons/python-3.8.0-embed/python38.dll";
+    private string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
     private PyObject pythonScript;
+
+    private Thread pythonThread;
 
 
     private void Start()
     {
         Runtime.PythonDLL = pythonPath;
 
-        // Initialize Python.NET
         PythonEngine.Initialize();
 
-        pythonScript = Py.Import(fileName);
+
+        dynamic sys = Py.Import("sys");
+        //sys.path.remove("E:\\Hieu\\UnityProjects\\TestHand\\Assets\\Pythons\\python-3.8.0-embed\\Lib\\site-packages\\cv2");
+        //sys.path.remove("Assets/Pythons/python-3.8.0-embed/Lib/site-packages/cv2");
+        sys.path.append(handDetectPath);
+        Debug.Log(sys.path);
+
+        dynamic os = Py.Import("os");
+        Debug.Log(os.getcwd());
+
+        //dynamic my_module = Py.Import("cv2");
+        //my_module.VideoCapture(0);
+
+        //string modelPath = handDetectPath + "/" + "action_test_2.h5";
+        //dynamic my_module = Py.Import("actionDetect");
+        //dynamic result = my_module.begin_detect(modelPath);
+        //Debug.Log(result);
+
+        //dynamic os = Py.Import("os");
+        //dynamic sys = Py.Import("sys");
+        //sys.path.append(os.getcwd());
+
+        //pythonScript = Py.Import(fileName);
+        //pythonScript = Py.Import("actionDetect");
     }
 
     private void OnDestroy()
@@ -46,16 +74,51 @@ public class SentenceConverter : MonoBehaviour
     }
 
     [Button]
+    public async void Test()
+    {
+        Debug.Log("Start Detect Async...");
+        await StartDetectAsync();
+        Debug.Log("Async operation completed.");
+    }
+
+    public async Task StartDetectAsync()
+    {
+        await Task.Run(async () =>
+        {
+            Debug.Log("Running Task...");
+            //using (Py.GIL()) // Acquire the Global Interpreter Lock
+            //{
+                Debug.Log("Finding model...");
+                string modelPath = handDetectPath + "/" + "action_test_2.h5";
+                dynamic my_module = Py.Import("actionDetect");
+                await my_module.begin_detect(modelPath);
+            //}
+        });
+    }
+
+    public void StartDetect()
+    {
+        using (Py.GIL()) // Acquire the Global Interpreter Lock
+        {
+            string modelPath = handDetectPath + "/" + "action_test_2.h5";
+            dynamic my_module = Py.Import("actionDetect");
+            my_module.begin_detect(modelPath);
+        }
+    }
+
+    [Button]
     public void RunPythonFile()
     {
         //using (Py.GIL()) // Acquire the Global Interpreter Lock
         //{
         Debug.Log("Running Python...");
         Debug.Log(inputField.text);
+
         var parameter = new PyString(inputField.text);
+        //var parameter = new PyString("Xin chào, tôi tên là Hiếu");
 
         PyDict replacements = new PyDict();
-        replacements["Tôi Tên"] = new PyString("Tôi tên là");
+        replacements["Tôi Tên"] = new PyString("tôi tên là");
         replacements["Vui Gặp"] = new PyString("Rất vui được gặp bạn");
         replacements["E^/"] = new PyString("Ế");
 
@@ -69,10 +132,16 @@ public class SentenceConverter : MonoBehaviour
         vocab_dict.Append(new PyString("U"));
         vocab_dict.Append(new PyString("Em"));
 
+        // Lấy kết quả và hiển thị lên màn hình  
         var result = pythonScript.InvokeMethod("language_to_sign", new PyObject[] { parameter, replacements, vocab_dict });
         Debug.Log(result);
+
         AnimationClip[] clipSequence = CreateAnimationSequence(result);
-        animationManager.PlaySequenceAnimation(clipSequence);
+        inputAnimation.Play("InputHide");
+        animationManager.PlaySequenceAnimation(clipSequence, () =>
+        {
+            inputAnimation.Play("InputShow");
+        });
         //}
     }
 
