@@ -82,14 +82,12 @@ public class WebCamReader : MonoBehaviour
             sequences.Append(keypoints);
             if (sequences.Length() == 10)
             {
-                // Detect 
+                // Thực hiện phát hiện  
                 dynamic detected = detectScript.detect(sequences, model);
                 Debug.Log(detected);
 
+                // Hiển thị hành động phát hiện được
                 if ((object)detected != null) detectText.text = actions[(int)detected];
-                //int? index = detected as int?;
-                //if (index.HasValue == true) detectText.text = actions[index.Value];
-                //else detectText.text = "";
 
                 sequences.DelItem(0);
             }
