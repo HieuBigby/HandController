@@ -23,12 +23,15 @@ public class SentenceConverter : MonoBehaviour
     public HandAnimationManager animationManager;
     public TMP_InputField inputField; 
     public Animation inputAnimation;
+    public float submitWaitTime = 2f;
 
     private string fileName = "languageToSign";
     private string pythonPath = "Assets/Pythons/python-3.8.0-embed/python38.dll";
     private readonly string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
     private PyObject pythonScript;
 
+    private string submitedText = "";
+    private float idleTime = 0f;
 
 
     private void Start()
@@ -43,6 +46,35 @@ public class SentenceConverter : MonoBehaviour
         Debug.Log(sys.path);
 
         pythonScript = Py.Import(fileName);
+
+        inputField.onValueChanged.RemoveListener(OnEdit);
+        inputField.onValueChanged.AddListener(OnEdit);
+
+        inputField.onSubmit.RemoveListener(OnSubmit);
+        inputField.onSubmit.AddListener(OnSubmit);
+    }
+
+    private void OnSubmit(string text)
+    {
+        StartTranslate();
+    }
+
+    private void OnEdit(string text)
+    {
+        idleTime = 0f;
+    }
+
+    private void Update()
+    {
+        if(inputField.text != submitedText)
+            idleTime += Time.deltaTime;
+
+        if(idleTime >= submitWaitTime)
+        {
+            idleTime = 0f;
+            Debug.Log("Submit...");
+            StartTranslate();
+        }
     }
 
     private void OnDestroy()
@@ -51,14 +83,20 @@ public class SentenceConverter : MonoBehaviour
         {
             PythonEngine.Shutdown();
         }
+
+        inputField.onSubmit.RemoveListener(OnSubmit);
+        inputField.onValueChanged.RemoveListener(OnEdit);
     }
 
 
     [Button]
-    public void RunPythonFile()
+    public void StartTranslate()
     {
         Debug.Log("Running Python...");
         Debug.Log(inputField.text);
+
+        submitedText = inputField.text;
+        if (inputField.text == "") return;
 
         var parameter = new PyString(inputField.text);
         //var parameter = new PyString("Xin chào, tôi tên là Hiếu");
@@ -83,10 +121,10 @@ public class SentenceConverter : MonoBehaviour
         Debug.Log(result);
 
         AnimationClip[] clipSequence = CreateAnimationSequence(result);
-        //inputAnimation.Play("InputHide");
+        animationManager.ResetAnimation();
         animationManager.PlaySequenceAnimation(clipSequence, () =>
         {
-            //inputAnimation.Play("InputShow");
+            submitedText = "";
         });
     }
 

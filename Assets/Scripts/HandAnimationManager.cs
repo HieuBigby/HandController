@@ -8,7 +8,7 @@ using UnityEngine.Events;
 public class HandAnimationManager : MonoBehaviour
 {
     public Animator handAnimator;
-    //public AnimationClip[] testAnimations;
+
     public float blendTime = 0.3f;
     public float hideDelay = 3f;
     public float inbetweenOffset = 0.5f;
@@ -16,6 +16,13 @@ public class HandAnimationManager : MonoBehaviour
     public float normalizedTimeOffset;
     public float normalizedTransitionTime;
 
+
+    public void ResetAnimation()
+    {
+        handAnimator.Rebind();
+        handAnimator.speed = 1f;
+        StopAllCoroutines();
+    }
 
     public void PlaySequenceAnimation(AnimationClip[] clipSequence, Action onComplete = null)
     {
