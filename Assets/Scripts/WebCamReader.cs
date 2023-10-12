@@ -32,7 +32,7 @@ public class WebCamReader : MonoBehaviour
     [Button]
     public void ShowWebCam()
     {
-        webCam = new WebCamTexture();
+        webCam = new WebCamTexture(640, 480);
         if(webCam.isPlaying == false) webCam.Play();
         img.texture = webCam;
     }
