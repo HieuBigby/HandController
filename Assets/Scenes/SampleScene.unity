@@ -7713,28 +7713,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 645071151}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adcf0034e54328347b1056a53f1292ef, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a39f81df4fd17a4dab76b1f7c278cb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animDicts:
-  - word: "Xin ch\xE0o"
-    clip: {fileID: 7400000, guid: ac009a4eb66500f4a9b82fe201f56a4f, type: 2}
-  - word: "T\xF4i"
-    clip: {fileID: 7400000, guid: 4c0d6112f6e35f94babaceab217d08be, type: 2}
-  - word: "T\xEAn"
-    clip: {fileID: 7400000, guid: ec90fd52e44c2704e81a993fe9241ff6, type: 2}
-  - word: H
-    clip: {fileID: 7400000, guid: 9b777de6dae854b42a5240261ed5a7ce, type: 2}
-  - word: I
-    clip: {fileID: 7400000, guid: faeb270fd74fbc047b6e217fcaebfd8b, type: 2}
-  - word: E^/
-    clip: {fileID: 7400000, guid: 80df4419330325b4e90da90f2c44e35c, type: 2}
-  - word: U
-    clip: {fileID: 7400000, guid: 84f3bf4540ae19d45a79d1c20956d42c, type: 2}
-  animationManager: {fileID: 1022061518}
-  inputField: {fileID: 419508312}
-  inputAnimation: {fileID: 0}
-  submitWaitTime: 1
+  sentenceConverter: {fileID: 1601789366}
+  webCamReader: {fileID: 1758499686}
+  switchBtn: {fileID: 507021423}
+  modeTxt1: {fileID: 1403107634}
+  modeTxt2: {fileID: 1072384285}
 --- !u!1 &670787345
 GameObject:
   m_ObjectHideFlags: 0
@@ -14842,7 +14828,6 @@ GameObject:
   - component: {fileID: 1473758073}
   - component: {fileID: 1473758076}
   - component: {fileID: 1473758075}
-  - component: {fileID: 1473758074}
   m_Layer: 5
   m_Name: WebCam
   m_TagString: Untagged
@@ -14869,20 +14854,6 @@ RectTransform:
   m_AnchoredPosition: {x: 479.0885, y: -450.00082}
   m_SizeDelta: {x: 958.147, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1473758074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473758072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7f976ca6e46ef4885b40df893fa1cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  img: {fileID: 1473758075}
-  detectText: {fileID: 1019002021}
 --- !u!114 &1473758075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15399,13 +15370,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1601789365}
+  - component: {fileID: 1601789366}
   m_Layer: 5
   m_Name: TextToHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1601789365
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15427,6 +15399,37 @@ RectTransform:
   m_AnchoredPosition: {x: -0.000061035, y: -90}
   m_SizeDelta: {x: 1920, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1601789366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601789364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adcf0034e54328347b1056a53f1292ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animDicts:
+  - word: "Xin ch\xE0o"
+    clip: {fileID: 7400000, guid: ac009a4eb66500f4a9b82fe201f56a4f, type: 2}
+  - word: "T\xF4i"
+    clip: {fileID: 7400000, guid: 4c0d6112f6e35f94babaceab217d08be, type: 2}
+  - word: "T\xEAn"
+    clip: {fileID: 7400000, guid: ec90fd52e44c2704e81a993fe9241ff6, type: 2}
+  - word: H
+    clip: {fileID: 7400000, guid: 9b777de6dae854b42a5240261ed5a7ce, type: 2}
+  - word: I
+    clip: {fileID: 7400000, guid: faeb270fd74fbc047b6e217fcaebfd8b, type: 2}
+  - word: E^/
+    clip: {fileID: 7400000, guid: 80df4419330325b4e90da90f2c44e35c, type: 2}
+  - word: U
+    clip: {fileID: 7400000, guid: 84f3bf4540ae19d45a79d1c20956d42c, type: 2}
+  animationManager: {fileID: 1022061518}
+  inputField: {fileID: 419508312}
+  inputAnimation: {fileID: 0}
+  submitWaitTime: 1
 --- !u!1 &1610306605
 GameObject:
   m_ObjectHideFlags: 0
@@ -15586,7 +15589,7 @@ GameObject:
   - component: {fileID: 1615077759}
   - component: {fileID: 1615077760}
   m_Layer: 0
-  m_Name: Hands
+  m_Name: HandModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17478,6 +17481,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1758499685}
+  - component: {fileID: 1758499686}
   m_Layer: 5
   m_Name: HandToText
   m_TagString: Untagged
@@ -17506,6 +17510,21 @@ RectTransform:
   m_AnchoredPosition: {x: -0.000061035, y: -90}
   m_SizeDelta: {x: 1920, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1758499686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758499684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b7f976ca6e46ef4885b40df893fa1cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  img: {fileID: 1473758075}
+  detectText: {fileID: 1019002021}
+  Initialized: 0
 --- !u!1 &1783938887
 GameObject:
   m_ObjectHideFlags: 0
@@ -22269,9 +22288,9 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 1022061519}
   - {fileID: 1966465687}
-  - {fileID: 1615077759}
   - {fileID: 1105293241}
   - {fileID: 1245702809}
+  - {fileID: 1615077759}
   - {fileID: 1367161224}
   - {fileID: 645071155}
   - {fileID: 588540512}

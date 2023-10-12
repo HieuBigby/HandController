@@ -24,28 +24,17 @@ public class SentenceConverter : MonoBehaviour
     public TMP_InputField inputField; 
     public Animation inputAnimation;
     public float submitWaitTime = 2f;
-
-    private string fileName = "languageToSign";
-    private string pythonPath = "Assets/Pythons/python-3.8.0-embed/python38.dll";
-    private readonly string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
+   
     private PyObject pythonScript;
-
     private string submitedText = "";
     private float idleTime = 0f;
 
 
-    private void Start()
+    public void Init()
     {
-        Runtime.PythonDLL = pythonPath;
+        Debug.Log("Khởi tạo Model dịch...");
 
-        PythonEngine.Initialize();
-
-        dynamic sys = Py.Import("sys");
-        //sys.path.remove("Assets/Pythons/python-3.8.0-embed/Lib/site-packages/cv2");
-        sys.path.append(handDetectPath);
-        Debug.Log(sys.path);
-
-        pythonScript = Py.Import(fileName);
+        pythonScript = Py.Import("languageToSign");
 
         inputField.onValueChanged.RemoveListener(OnEdit);
         inputField.onValueChanged.AddListener(OnEdit);
@@ -64,6 +53,13 @@ public class SentenceConverter : MonoBehaviour
         idleTime = 0f;
     }
 
+    private void OnDisable()
+    {
+        inputField.text = "";
+        submitedText = "";
+        animationManager.ResetAnimation();
+    }
+
     private void Update()
     {
         if(inputField.text != submitedText)
@@ -79,11 +75,6 @@ public class SentenceConverter : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (PythonEngine.IsInitialized)
-        {
-            PythonEngine.Shutdown();
-        }
-
         inputField.onSubmit.RemoveListener(OnSubmit);
         inputField.onValueChanged.RemoveListener(OnEdit);
     }

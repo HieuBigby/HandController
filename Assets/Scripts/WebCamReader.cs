@@ -28,18 +28,15 @@ public class WebCamReader : MonoBehaviour
     private dynamic holistic;
     private dynamic model;
 
+    public bool Initialized;
 
-    [Button]
-    public void ShowWebCam()
+
+    public void Init()
     {
+        Debug.Log("Khởi tạo WebCam");
         webCam = new WebCamTexture(640, 480);
-        if(webCam.isPlaying == false) webCam.Play();
         img.texture = webCam;
-    }
 
-    [Button]
-    public void StartDetect()
-    {
         // Import thư viện 
         detectScript = Py.Import("actionDetect");
         cv2 = Py.Import("cv2");
@@ -53,6 +50,30 @@ public class WebCamReader : MonoBehaviour
         string modelPath = $"{handDetectPath}/action_test_2.h5";
         model = detectScript.load_model(modelPath, actions.Length);
 
+        Initialized = true;
+    }
+
+    private void OnEnable()
+    {
+        if (!Initialized) return;
+
+        ShowWebCam();
+        StartDetect();
+    }
+
+    private void OnDisable()
+    {
+        webCam.Stop();
+        StopDetect();
+    }
+
+    public void ShowWebCam()
+    {
+        if(webCam.isPlaying == false) webCam.Play();
+    }
+
+    public void StartDetect()
+    {
         isDetecting = true;
         StartCoroutine(DetectRoutine());
     }
@@ -94,10 +115,10 @@ public class WebCamReader : MonoBehaviour
         }
     }
 
-    [Button]
     public void StopDetect()
     {
         isDetecting = false;
+        detectText.text = "";
     }
 
     private Texture2D GetTexture2D(Texture texture)
