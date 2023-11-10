@@ -4,6 +4,7 @@ using PythonEvent;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using TMPro;
 using Unity.Barracuda;
@@ -19,12 +20,13 @@ public class WebCamReader : MonoBehaviour
     private bool isDetecting;
     private string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
     private string imageFilePath = "Assets/Pictures/tex.jpg";
-    private string[] actions = {"A", "B", "C", "D", "E"};
+    private string[] actions = { "None", "A", "B", "C", "D", "E", "I", "H", "U", "Xin chào", "Tôi", "Tên" };
 
     private dynamic detectScript;
     private dynamic cv2;
     private dynamic cap;
     private dynamic mp;
+    private dynamic np;
     private dynamic holistic;
     private dynamic model;
 
@@ -41,13 +43,14 @@ public class WebCamReader : MonoBehaviour
         detectScript = Py.Import("actionDetect");
         cv2 = Py.Import("cv2");
         mp = Py.Import("mediapipe");
+        np = Py.Import("numpy");
 
         // Khởi tạo mediapipe
         dynamic mp_holistic = mp.solutions.holistic;
         holistic = mp_holistic.Holistic(min_detection_confidence: 0.5, min_tracking_confidence: 0.5);
 
         // Khởi tạo model phát hiện thủ ngữ 
-        string modelPath = $"{handDetectPath}/action_test_2.h5";
+        string modelPath = $"{handDetectPath}/action_test_3.h5";
         model = detectScript.load_model(modelPath, actions.Length);
 
         Initialized = true;
@@ -82,6 +85,8 @@ public class WebCamReader : MonoBehaviour
     public IEnumerator DetectRoutine()
     {
         PyList sequences = new PyList();
+        PyList predictions = new PyList();
+        PyList sentences = new PyList();
 
         while (isDetecting)
         {
@@ -105,12 +110,52 @@ public class WebCamReader : MonoBehaviour
             {
                 // Thực hiện phát hiện  
                 dynamic detected = detectScript.detect(sequences, model);
-                Debug.Log(detected);
+                //Debug.Log(detected);
+
+                // Tất cả các dự đoán được đưa vào mảng predictions 
+                if ((object)detected != null) predictions.Append(detected);
+
+                if (sentences.Length() > 0)
+                {
+                    // Lấy ra kết quả được dự đoán nhiều nhất 
+                    dynamic most_res = np.bincount(predictions).argmax();
+                    //Debug.Log("Most: " + most_res);
+                    int acIndex = (int)most_res;
+
+                    // Nếu hành động đó khác với hành động trước đó thì hiển thị lên màn hinh
+                    if (actions[acIndex] != sentences.Last().ToString())
+                        sentences.Append(actions[acIndex].ToPython());
+                }
+                else
+                {
+                    if ((object)detected != null) sentences.Append(actions[(int)detected].ToPython());
+                }
+
+                Debug.Log("Sentence Count: " + sentences.Length());
 
                 // Hiển thị hành động phát hiện được
-                if ((object)detected != null) detectText.text = actions[(int)detected];
+                //if ((object)detected != null) detectText.text = actions[(int)detected];
+
+                yield return null;
+
+                // Chuyển câu thủ ngữ thành ngữ pháp tiếng Việt 
+                dynamic filtered_sentences = detectScript.apply_replacements(sentences);
+
+                yield return null;
+
+                PyIter pyIter = PyIter.GetIter(filtered_sentences);
+                string detectedText = "";
+                while (pyIter.MoveNext())
+                {
+                    PyObject pyObject = pyIter.Current;
+                    string word = pyObject.ToString();
+                    if (word.Equals("None")) continue;
+                    detectedText += word + " ";
+                }
+                detectText.text = detectedText;
 
                 sequences.DelItem(0);
+                if (predictions.Length() == 15) predictions.DelItem(0);
             }
         }
     }

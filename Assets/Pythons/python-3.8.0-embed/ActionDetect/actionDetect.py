@@ -123,7 +123,7 @@ def normalize_vector(point1, point2):
 
 def apply_replacements(input_array):
     replacements = {
-        "Toi Ten": "Toi ten la",
+        "Tôi Tên": "Tôi tên là",
         # Thêm các cụm từ và cụm từ thay thế khác vào đây
     }
 
