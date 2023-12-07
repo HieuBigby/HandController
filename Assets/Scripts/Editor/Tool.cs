@@ -75,5 +75,10 @@ public class Tool : ScriptableWizard
                 if (!found) Debug.LogError("Không tìm thấy " + overrideTransform.name + " để thay Override");
             }
         }
+
+        if (GUILayout.Button("Toogle mode"))
+        {
+                
+        }
     }
 }

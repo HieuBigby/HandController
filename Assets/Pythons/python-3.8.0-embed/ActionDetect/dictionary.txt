@@ -1,0 +1,20 @@
+None: 0
+A: 1
+B: 2
+C: 3
+D: 4
+E: 5
+I: 6
+H: 7
+U: 8
+Xin chào: 9
+Tôi: 10
+Tên: 11
+Cảm ơn: 12
+Hẹn: 13
+Gặp: 14
+Lại: 15
+Vui: 16
+Khoẻ: 17
+Xin lỗi: 18
+Tạm biệt: 19

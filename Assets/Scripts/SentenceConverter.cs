@@ -92,20 +92,8 @@ public class SentenceConverter : MonoBehaviour
         var parameter = new PyString(inputField.text);
         //var parameter = new PyString("Xin chào, tôi tên là Hiếu");
 
-        PyDict replacements = new PyDict();
-        replacements["Tôi Tên"] = new PyString("tôi tên là");
-        replacements["Vui Gặp"] = new PyString("Rất vui được gặp bạn");
-        replacements["E^/"] = new PyString("Ế");
-
-        PyList vocab_dict = new PyList();
-        vocab_dict.Append(new PyString("Xin chào"));
-        vocab_dict.Append(new PyString("Tôi"));
-        vocab_dict.Append(new PyString("Tên"));
-        vocab_dict.Append(new PyString("H"));
-        vocab_dict.Append(new PyString("I"));
-        vocab_dict.Append(new PyString("Ế"));
-        vocab_dict.Append(new PyString("U"));
-        vocab_dict.Append(new PyString("Em"));
+        PyDict replacements = AppManager.Instance.PyDictStructure;
+        PyList vocab_dict = AppManager.Instance.PyListActions;
 
         // Lấy kết quả và hiển thị lên màn hình  
         var result = pythonScript.InvokeMethod("language_to_sign", new PyObject[] { parameter, replacements, vocab_dict });

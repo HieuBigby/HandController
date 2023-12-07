@@ -4,6 +4,7 @@ using PythonEvent;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using TMPro;
@@ -15,12 +16,15 @@ public class WebCamReader : MonoBehaviour
 {
     public RawImage img;
     public TextMeshProUGUI detectText;
+    public float maxClearTime = 5f;
 
     private WebCamTexture webCam;
     private bool isDetecting;
     private string handDetectPath = "Assets/Pythons/python-3.8.0-embed/ActionDetect";
     private string imageFilePath = "Assets/Pictures/tex.jpg";
     private string[] actions = { "None", "A", "B", "C", "D", "E", "I", "H", "U", "Xin chào", "Tôi", "Tên" };
+    private string lastDetectText;
+    private float idleTime;
 
     private dynamic detectScript;
     private dynamic cv2;
@@ -31,7 +35,6 @@ public class WebCamReader : MonoBehaviour
     private dynamic model;
 
     public bool Initialized;
-
 
     public void Init()
     {
@@ -45,13 +48,17 @@ public class WebCamReader : MonoBehaviour
         mp = Py.Import("mediapipe");
         np = Py.Import("numpy");
 
+        actions = AppManager.Instance.ActionList;
+
         // Khởi tạo mediapipe
         dynamic mp_holistic = mp.solutions.holistic;
         holistic = mp_holistic.Holistic(min_detection_confidence: 0.5, min_tracking_confidence: 0.5);
 
         // Khởi tạo model phát hiện thủ ngữ 
-        string modelPath = $"{handDetectPath}/action_test_3.h5";
+        string modelPath = $"{handDetectPath}/action_final_8020.h5";
         model = detectScript.load_model(modelPath, actions.Length);
+
+        
 
         Initialized = true;
     }
@@ -68,6 +75,25 @@ public class WebCamReader : MonoBehaviour
     {
         webCam.Stop();
         StopDetect();
+    }
+
+    private void Update()
+    {
+        if (detectText.text == "") return;
+
+        if (detectText.text == lastDetectText)
+            idleTime += Time.deltaTime;
+        else idleTime = 0f;
+
+        //Debug.Log("Idle time: " + idleTime);
+
+        if (idleTime >= maxClearTime)
+        {
+            idleTime = 0f;
+            detectText.text = "";
+            StopAllCoroutines();
+            StartDetect();
+        }
     }
 
     public void ShowWebCam()
@@ -87,6 +113,7 @@ public class WebCamReader : MonoBehaviour
         PyList sequences = new PyList();
         PyList predictions = new PyList();
         PyList sentences = new PyList();
+        PyDict structures = AppManager.Instance.PyDictStructure;
 
         while (isDetecting)
         {
@@ -131,15 +158,12 @@ public class WebCamReader : MonoBehaviour
                     if ((object)detected != null) sentences.Append(actions[(int)detected].ToPython());
                 }
 
-                Debug.Log("Sentence Count: " + sentences.Length());
-
-                // Hiển thị hành động phát hiện được
-                //if ((object)detected != null) detectText.text = actions[(int)detected];
+                //Debug.Log("Sentence Count: " + sentences.Length());
 
                 yield return null;
 
                 // Chuyển câu thủ ngữ thành ngữ pháp tiếng Việt 
-                dynamic filtered_sentences = detectScript.apply_replacements(sentences);
+                dynamic filtered_sentences = detectScript.apply_replacements(sentences, structures);
 
                 yield return null;
 
@@ -152,6 +176,7 @@ public class WebCamReader : MonoBehaviour
                     if (word.Equals("None")) continue;
                     detectedText += word + " ";
                 }
+                lastDetectText = detectText.text;
                 detectText.text = detectedText;
 
                 sequences.DelItem(0);

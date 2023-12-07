@@ -11,28 +11,6 @@ import cv2
 import numpy as np
 import random
 
-# clr.AddReference(r"Assets/Pythons/python-3.8.0-embed/EventHandler.cs")
-# import PythonEvent
-# from PIL import ImageFont, ImageDraw, Image
-
-
-def generate_distinct_colors(num_colors):
-    distinct_colors = []
-    for _ in range(num_colors): 
-        color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
-        distinct_colors.append(color)
-    return distinct_colors
-
-
-def prob_viz(res, actions, input_frame, colors):
-    output_frame = input_frame.copy()
-    for num, prob in enumerate(res):
-        cv2.rectangle(output_frame, (0, 60 + num * 40), (int(prob * 100), 90 + num * 40), colors[num], -1)
-        cv2.putText(output_frame, actions[num], (0, 85 + num * 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
-                    cv2.LINE_AA)
-
-    return output_frame
-
 
 def mediapipe_detection(image, model):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # COLOR CONVERSION BGR 2 RGB
@@ -121,12 +99,7 @@ def normalize_vector(point1, point2):
     return normalized_vector
 
 
-def apply_replacements(input_array):
-    replacements = {
-        "Tôi Tên": "Tôi tên là",
-        # Thêm các cụm từ và cụm từ thay thế khác vào đây
-    }
-
+def apply_replacements(input_array, replacements):
     output_array = []
     i = 0
 
@@ -176,38 +149,9 @@ def detect(sequences, model, threshold = 0.9):
         return np.argmax(res)
 
 
-def video_capture():
-    cap = cv2.VideoCapture(0)
-
-    # Check if camera opened successfully
-    if (cap.isOpened() == False):
-        print("Error opening video stream or file")
-
-    # Read until video is completed
-    while cap.isOpened():
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-        if ret:
-            # Display the resulting frame
-            cv2.imshow('Frame', frame)
-
-            # Press Q on keyboard to  exit
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                break
-        # Break the loop
-        else:
-            break
-
-    # When everything done, release the video capture object
-    cap.release()
-    # Closes all the frames
-    cv2.destroyAllWindows()
-
-
 def begin_detect(model_path):
     # Danh sách các action đã tạo
     actions = np.array(['A', 'B', 'C', 'D', 'E'])
-    # eventHandler = PythonEvent.EventHandler()
 
     # Videos are going to be 10 frames in length
     sequence_length = 10
@@ -287,13 +231,6 @@ def begin_detect(model_path):
             cv2.rectangle(image, (0, 0), (640, 40), (245, 117, 16), -1)
             cv2.putText(image, ' '.join(filtered_sentences), (3, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-            
-            str_words = str(' '.join(filtered_sentences))
-            # eventHandler.PrintText(str_words)
-            # img_pil = Image.fromarray(image)
-            # draw = ImageDraw.Draw(img_pil)
-            # draw.text((10, 5), ' '.join(filtered_sentences), font=font, fill=(0,255,0,0))
-            # image = np.array(img_pil)
 
             # Show to screen
             cv2.imshow('OpenCV Feed', image)

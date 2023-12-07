@@ -16,39 +16,38 @@ public class UdpReceiver : MonoBehaviour
     public bool startRecieving = true; 
     public bool printToConsole = false; 
     public string data;
-    
-    
-    //public void Start()
-    //{
-    //    receiveThread = new Thread(
-    //        new ThreadStart(ReceiveData));
-    //    receiveThread.IsBackground = true; receiveThread.Start();
 
-    //}
-    
-    //// Receive thread 
-    //private void ReceiveData()
-    //{
-    //    client = new UdpClient(port);
-    //    while (startRecieving)
-    //    {
-    //        try
-    //        {
-    //            IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0); 
-    //            byte[] dataByte = client.Receive(ref anyIP);
-    //            data = Encoding.UTF8.GetString(dataByte);
-                
-    //            if (printToConsole) { print(data); }
-    //        }
-    //        catch (Exception err)
-    //        {
-    //            print(err.ToString());
-    //        }
-    //    }
-    //}
+    public void Start()
+    {
+        receiveThread = new Thread(
+            new ThreadStart(ReceiveData));
+        receiveThread.IsBackground = true; receiveThread.Start();
 
-    //private void OnDestroy() 
-    //{
-    //    receiveThread.Abort();
-    //}
+    }
+
+    // Receive thread 
+    private void ReceiveData()
+    {
+        client = new UdpClient(port);
+        while (startRecieving)
+        {
+            try
+            {
+                IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
+                byte[] dataByte = client.Receive(ref anyIP);
+                data = Encoding.UTF8.GetString(dataByte);
+
+                if (printToConsole) { print(data); }
+            }
+            catch (Exception err)
+            {
+                print(err.ToString());
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        receiveThread.Abort();
+    }
 }

@@ -7,6 +7,7 @@ using UnityEngine.Events;
 
 public class HandAnimationManager : MonoBehaviour
 {
+    public AnimationClip[] testSequence;
     public Animator handAnimator;
 
     public float blendTime = 0.3f;
@@ -45,5 +46,11 @@ public class HandAnimationManager : MonoBehaviour
             onComplete?.Invoke();
         }
         StartCoroutine(PlayAnimationRoutine()); 
+    }
+
+    [Button]
+    public void TestSequence()
+    {
+        PlaySequenceAnimation(testSequence);
     }
 }
