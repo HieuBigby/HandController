@@ -15433,6 +15433,32 @@ MonoBehaviour:
     clip: {fileID: 7400000, guid: 80df4419330325b4e90da90f2c44e35c, type: 2}
   - word: U
     clip: {fileID: 7400000, guid: 84f3bf4540ae19d45a79d1c20956d42c, type: 2}
+  - word: A
+    clip: {fileID: 7400000, guid: 4a837b8e2bf4bf14fac76e2d13755f46, type: 2}
+  - word: B
+    clip: {fileID: 7400000, guid: 32ddc6c5375a93649a86dc79bf9f1ebb, type: 2}
+  - word: C
+    clip: {fileID: 7400000, guid: 1a4abee5175a4084b9777ff2b79c3bfa, type: 2}
+  - word: D
+    clip: {fileID: 7400000, guid: 77d8a259d09d55c459a601ffc94305ff, type: 2}
+  - word: "G\u1EB7p"
+    clip: {fileID: 7400000, guid: 8cb5760229d20b0438293d6c5f376c07, type: 2}
+  - word: "H\u1EB9n"
+    clip: {fileID: 7400000, guid: 9acfaece616008d43a65b03bb9619f7b, type: 2}
+  - word: "Kh\u1ECFe"
+    clip: {fileID: 7400000, guid: 70025486fe2f761489ea1b60ce9fec3e, type: 2}
+  - word: "L\u1EA1i"
+    clip: {fileID: 7400000, guid: 59492f7329a19e048b3ffe88cdbd3c47, type: 2}
+  - word: "T\u1EA1m bi\u1EC7t"
+    clip: {fileID: 7400000, guid: 1767b3061804ccd4a9b080b9dde4933d, type: 2}
+  - word: Vui
+    clip: {fileID: 7400000, guid: 17395eea8e4ea534abf952bc67afb300, type: 2}
+  - word: "Xin l\u1ED7i"
+    clip: {fileID: 7400000, guid: 85917185e19b99e4ebc63a10bbbc3f2b, type: 2}
+  - word: "C\u1EA3m \u01A1n"
+    clip: {fileID: 7400000, guid: 9d0c97701784a4c48a04623493da0dc1, type: 2}
+  - word: "B\u1EA1n"
+    clip: {fileID: 7400000, guid: 73a7ada7dff69bb4aaf1cdf4794bf322, type: 2}
   animationManager: {fileID: 1022061518}
   inputField: {fileID: 419508312}
   inputAnimation: {fileID: 0}

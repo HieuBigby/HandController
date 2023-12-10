@@ -55,7 +55,7 @@ public class WebCamReader : MonoBehaviour
         holistic = mp_holistic.Holistic(min_detection_confidence: 0.5, min_tracking_confidence: 0.5);
 
         // Khởi tạo model phát hiện thủ ngữ 
-        string modelPath = $"{handDetectPath}/action_final_8020.h5";
+        string modelPath = $"{handDetectPath}/action_final_noothers.h5";
         model = detectScript.load_model(modelPath, actions.Length);
 
         

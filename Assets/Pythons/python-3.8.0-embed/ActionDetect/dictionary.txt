@@ -15,6 +15,7 @@ Hẹn: 13
 Gặp: 14
 Lại: 15
 Vui: 16
-Khoẻ: 17
+Khỏe: 17
 Xin lỗi: 18
 Tạm biệt: 19
+Bạn: 20

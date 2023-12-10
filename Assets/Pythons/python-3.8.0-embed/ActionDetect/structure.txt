@@ -1,3 +1,7 @@
 Tôi Tên: Tôi tên là
 Vui Gặp: Rất vui được gặp bạn
+Bạn Khỏe: Bạn khỏe không?
+Hẹn Gặp Lại: Hẹn gặp lại
+Tôi Khỏe: Tôi khỏe
+Cảm ơn Bạn: Cảm ơn bạn
 E^/: Ế

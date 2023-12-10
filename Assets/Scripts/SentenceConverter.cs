@@ -79,17 +79,29 @@ public class SentenceConverter : MonoBehaviour
         inputField.onValueChanged.RemoveListener(OnEdit);
     }
 
+    public static string FirstCharToUpper(string input)
+    {
+        if (String.IsNullOrEmpty(input)) return "";
+        return input.First().ToString().ToUpper() + input.Substring(1);
+    }
+
 
     [Button]
     public void StartTranslate()
     {
         Debug.Log("Running Python...");
-        Debug.Log(inputField.text);
+        string[] segments = inputField.text.Split('.', ',');
+        for (int i = 0; i < segments.Length; i++)
+        {
+            segments[i] = FirstCharToUpper(segments[i].Trim());
+        }
+        string inputStr = String.Join(". ", segments);
+        Debug.Log(inputStr);
 
         submitedText = inputField.text;
-        if (inputField.text == "") return;
+        if (inputStr == "") return;
 
-        var parameter = new PyString(inputField.text);
+        var parameter = new PyString(inputStr);
         //var parameter = new PyString("Xin chào, tôi tên là Hiếu");
 
         PyDict replacements = AppManager.Instance.PyDictStructure;
